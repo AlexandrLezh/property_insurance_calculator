@@ -6,7 +6,6 @@ import domen.Policy;
 import domen.RiskType;
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.Optional;
 
 public class FirePremiumCalculatorImpl implements ConditionCalculator {
 
@@ -28,19 +27,11 @@ public class FirePremiumCalculatorImpl implements ConditionCalculator {
 	}
 
 	private static BigDecimal getFireSumNonMovable(Policy policy) {
-
-		Optional<NonMovableProperty> optNonMovProperty = policy.getNonMovableProperties().stream()
-				.findFirst();
-
-		BigDecimal result = optNonMovProperty.map(nonMovableProperty -> {
-			return policy.getNonMovableProperties().stream()
-					.filter(property -> property.getRiskTypes().contains(RiskType.FIRE))
-					.map(NonMovableProperty::getCost)
-					.reduce(BigDecimal.ZERO, BigDecimal::add);
-		}).orElseGet(() -> {
-			return BigDecimal.ZERO;
-		});
-		return result;
+		return policy.getNonMovableProperties().stream()
+				.filter(property -> property != null && property.getRiskTypes() != null &&
+						property.getRiskTypes().contains(RiskType.FIRE) && property.getCost() != null)
+				.map(NonMovableProperty::getCost)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 	private static BigDecimal getFireSumMovable(Policy policy) {
