@@ -5,7 +5,8 @@ import domen.NonMovableProperty;
 import domen.Policy;
 import domen.RiskType;
 import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
 
 public class TheftPremiumCalculatorImpl implements ConditionCalculator {
@@ -28,17 +29,26 @@ public class TheftPremiumCalculatorImpl implements ConditionCalculator {
 	}
 
 	private static BigDecimal getTheftSumNonMovable(Policy policy) {
-		return policy.getNonMovableProperties().stream()
-				.filter(nonMovableProperty -> nonMovableProperty.getRiskTypes().contains(RiskType.THEFT))
-				.map(NonMovableProperty::getCost)
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		Optional<NonMovableProperty> optNonMovProperty = policy.getNonMovableProperties().stream()
+				.findFirst();
+
+		BigDecimal result = optNonMovProperty.map(nonMovableProperty -> {
+			return policy.getNonMovableProperties().stream()
+					.filter(property -> property.getRiskTypes().contains(RiskType.THEFT))
+					.map(NonMovableProperty::getCost)
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+		}).orElseGet(() -> {
+			return BigDecimal.ZERO;
+		});
+		return result;
 	}
 
 	private static BigDecimal getTheftSumMovable(Policy policy) {
+
 		return policy.getNonMovableProperties().stream()
-				.map(NonMovableProperty::getMovableProperties)
-				.flatMap(Collection::stream)
-				.filter(movableProperty -> movableProperty.getRiskTypes().contains(RiskType.THEFT))
+				.flatMap(nonMovableProperty -> nonMovableProperty.getMovableProperties()
+						.orElse(Collections.emptyList()).stream())
+				.filter(property -> property.getRiskTypes().contains(RiskType.THEFT))
 				.map(MovableProperty::getCost)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
