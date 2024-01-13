@@ -3,6 +3,7 @@ package service;
 import domen.Policy;
 import domen.RiskType;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class TheftPremiumCalculatorImpl implements ConditionCalculator {
 
@@ -17,9 +18,11 @@ public class TheftPremiumCalculatorImpl implements ConditionCalculator {
 		BigDecimal theftSum = utility.calculate(policy, RiskType.THEFT);
 
 		if (theftSum.compareTo(CONDITION_SUM) > 0) {
-			return theftSum.multiply(BigDecimal.valueOf(CONDITION_COEFFICIENT));
+			return theftSum.multiply(BigDecimal.valueOf(CONDITION_COEFFICIENT))
+					.setScale(2, RoundingMode.HALF_UP);
 		}
-		return theftSum.multiply(BigDecimal.valueOf(DEFAULT_COEFFICIENT));
+		return theftSum.multiply(BigDecimal.valueOf(DEFAULT_COEFFICIENT))
+				.setScale(2, RoundingMode.HALF_UP);
 	}
 
 }

@@ -19,7 +19,7 @@ public class CalculationUtility {
 
 	private static BigDecimal getSumNonMovable(Policy policy, RiskType riskType) {
 
-		return policy.getNonMovableProperties().stream()
+		return policy.getNonMovableProperties().stream() //todo remove null (Optional???)
 				.filter(property -> property != null && property.getRiskTypes() != null &&
 						property.getRiskTypes().contains(riskType) && property.getCost() != null)
 				.map(NonMovableProperty::getCost)

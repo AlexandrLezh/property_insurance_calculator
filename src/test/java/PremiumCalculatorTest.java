@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 public class PremiumCalculatorTest {
 	private final PremiumCalculator premiumCalculator = new PremiumCalculator();
 	@Test
-	public void someSubObjectFireTheft() {
+	public void fireOverLimitForMovableProperty() {
 
 		MovableProperty pc = createMovableProperty(1L,
 				"McBook",
@@ -30,6 +30,31 @@ public class PremiumCalculatorTest {
 		BigDecimal premium = premiumCalculator.calculate(policy);
 
 		assertEquals(new BigDecimal("2.28").stripTrailingZeros(),
+				premium.stripTrailingZeros());
+	}
+	@Test
+	public void theftFireOverLimitForMovableProperty() {
+
+		MovableProperty pc = createMovableProperty(1L,
+				"McBook",
+				"500.00",
+				List.of(RiskType.FIRE));
+
+		MovableProperty tv = createMovableProperty(1L,
+				"Sony",
+				"102.51",
+				List.of(RiskType.THEFT));
+
+		NonMovableProperty property1 = createProperty(1L,
+				"House", List.of(pc, tv));
+
+		Policy policy = createPolicy("LV-1",
+				StatusOfPolicy.REGISTERED,
+				List.of(property1));
+
+		BigDecimal premium = premiumCalculator.calculate(policy);
+
+		assertEquals(new BigDecimal("17.13").stripTrailingZeros(),
 				premium.stripTrailingZeros());
 	}
 	@Test

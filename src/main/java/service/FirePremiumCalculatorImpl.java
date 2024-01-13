@@ -3,6 +3,7 @@ package service;
 import domen.Policy;
 import domen.RiskType;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class FirePremiumCalculatorImpl implements ConditionCalculator {
 
@@ -17,9 +18,11 @@ public class FirePremiumCalculatorImpl implements ConditionCalculator {
 		BigDecimal fireSum = utility.calculate(policy, RiskType.FIRE);
 
 		if (fireSum.compareTo(CONDITION_SUM) > 0) {
-			return fireSum.multiply(BigDecimal.valueOf(CONDITION_COEFFICIENT));
+			return fireSum.multiply(BigDecimal.valueOf(CONDITION_COEFFICIENT))
+					.setScale(2, RoundingMode.HALF_UP);
 		}
-		return fireSum.multiply(BigDecimal.valueOf(DEFAULT_COEFFICIENT));
+		return fireSum.multiply(BigDecimal.valueOf(DEFAULT_COEFFICIENT))
+				.setScale(2, RoundingMode.HALF_UP);
 	}
 
 }
